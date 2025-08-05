@@ -228,6 +228,7 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
                                 </FormControl>
                                 <Label
                                   htmlFor={style}
+                                  data-state={field.value === style ? 'checked' : 'unchecked'}
                                   className="px-3 py-1.5 border rounded-full cursor-pointer transition-colors text-sm font-medium
                                     data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground 
                                     hover:bg-accent hover:text-accent-foreground"
@@ -278,7 +279,7 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
                   </div>
                   <div className="space-y-2 col-span-2">
                     <Label htmlFor="blur" className="font-headline">Blur</Label>
-                    <Slider id="blur" value={[filters.blur]} onValueChange={handleFilterChange('blur')} max={10} step={1} />
+                    <Slider id="blur" value={[filters.blur]} onValueChange={handleFilterChange('blur')} max={10} step={0.1} />
                   </div>
                 </div>
               </div>
