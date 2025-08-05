@@ -218,7 +218,7 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
                         <FormControl>
                           <RadioGroup
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value}
                             className="flex flex-wrap gap-2"
                           >
                             {wallpaperStyles.map((style) => (
