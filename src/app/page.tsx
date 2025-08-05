@@ -15,6 +15,10 @@ export default function Home() {
   const handleImageSelected = (imageUrl: string) => {
     setSelectedImage(imageUrl);
   };
+  
+  const handleImageGenerated = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
@@ -31,7 +35,7 @@ export default function Home() {
           <aside className="lg:col-span-4">
              <div className="sticky top-8 space-y-8">
               <h1 className="text-3xl font-headline font-bold text-center lg:text-left">AI Tools</h1>
-              <AiTools />
+              <AiTools onImageGenerated={handleImageGenerated} />
             </div>
           </aside>
         </div>
