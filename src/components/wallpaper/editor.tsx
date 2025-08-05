@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface EditorProps {
   selectedImage: string | null;
@@ -168,11 +168,68 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
           </div>
         </div>
         <div className="md:col-span-7 p-6 space-y-6 self-center">
-          <Tabs defaultValue="filters" className="w-full">
+          <Tabs defaultValue="generate" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="filters"><Wand2 className="mr-2 h-4 w-4" /> Filters</TabsTrigger>
               <TabsTrigger value="generate"><ImageIcon className="mr-2 h-4 w-4" /> Generate</TabsTrigger>
+              <TabsTrigger value="filters"><Wand2 className="mr-2 h-4 w-4" /> Filters</TabsTrigger>
             </TabsList>
+            <TabsContent value="generate" className="pt-4">
+               <Form {...generateForm}>
+                <form onSubmit={generateForm.handleSubmit(onGenerateSubmit)} className="space-y-4">
+                  <FormField
+                    control={generateForm.control}
+                    name="prompt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Wallpaper Prompt</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="e.g., A majestic wolf howling at a vibrant, neon moon in a dark forest, synthwave style." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={generateForm.control}
+                    name="style"
+                    render={({ field }) => (
+                      <FormItem className="space-y-3">
+                        <FormLabel>Style</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex flex-wrap gap-2"
+                          >
+                            {wallpaperStyles.map((style) => (
+                              <FormItem key={style} className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value={style} id={style} className="sr-only" />
+                                </FormControl>
+                                <Label
+                                  htmlFor={style}
+                                  className="px-3 py-1.5 border rounded-full cursor-pointer transition-colors text-sm font-medium
+                                    data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground 
+                                    hover:bg-accent hover:text-accent-foreground"
+                                >
+                                  {style}
+                                </Label>
+                              </FormItem>
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" disabled={isGenerating} className="w-full">
+                    {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Generate Wallpaper
+                  </Button>
+                </form>
+              </Form>
+              {isGenerating && <div className="text-center my-4"><Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" /><p className="text-sm text-muted-foreground mt-2">Generating... this can take a moment.</p></div>}
+            </TabsContent>
             <TabsContent value="filters" className="pt-4">
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -206,52 +263,6 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
                   </div>
                 </div>
               </div>
-            </TabsContent>
-            <TabsContent value="generate" className="pt-4">
-               <Form {...generateForm}>
-                <form onSubmit={generateForm.handleSubmit(onGenerateSubmit)} className="space-y-4">
-                  <FormField
-                    control={generateForm.control}
-                    name="prompt"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Wallpaper Prompt</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="e.g., A majestic wolf howling at a vibrant, neon moon in a dark forest, synthwave style." {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={generateForm.control}
-                    name="style"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Style</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a style" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {wallpaperStyles.map((style) => (
-                              <SelectItem key={style} value={style}>{style}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" disabled={isGenerating} className="w-full">
-                    {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Generate Wallpaper
-                  </Button>
-                </form>
-              </Form>
-              {isGenerating && <div className="text-center my-4"><Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" /><p className="text-sm text-muted-foreground mt-2">Generating... this can take a moment.</p></div>}
             </TabsContent>
           </Tabs>
           
