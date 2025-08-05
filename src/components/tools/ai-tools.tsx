@@ -136,8 +136,13 @@ export default function AiTools({ onImageGenerated }: AiToolsProps) {
                   </Button>
                 </div>
                  <h4 className="font-headline font-semibold">Suggested Tags</h4>
-                <div className="flex flex-wrap gap-2">
-                  {ideaResult.seoTags.split(',').map((tag, i) => <Badge key={i} variant="secondary">{tag.trim()}</Badge>)}
+                <div className="p-4 rounded-md bg-card border relative group">
+                  <div className="flex flex-wrap gap-2">
+                    {ideaResult.seoTags.split(',').map((tag, i) => <Badge key={i} variant="secondary">{tag.trim()}</Badge>)}
+                  </div>
+                  <Button size="icon" variant="ghost" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => copyToClipboard(ideaResult.seoTags)}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             )}
@@ -169,8 +174,13 @@ export default function AiTools({ onImageGenerated }: AiToolsProps) {
             {seoResult && (
                <div className="mt-6 space-y-4 animate-in fade-in">
                 <h4 className="font-headline font-semibold">Generated SEO Tags</h4>
-                <div className="flex flex-wrap gap-2">
-                  {seoResult.map((tag, i) => <Badge key={i} variant="secondary">{tag}</Badge>)}
+                <div className="p-4 rounded-md bg-card border relative group">
+                  <div className="flex flex-wrap gap-2">
+                    {seoResult.map((tag, i) => <Badge key={i} variant="secondary">{tag}</Badge>)}
+                  </div>
+                  <Button size="icon" variant="ghost" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => copyToClipboard(seoResult.join(', '))}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             )}
