@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface EditorProps {
   selectedImage: string | null;
@@ -24,6 +25,7 @@ interface EditorProps {
 
 const generateSchema = z.object({
   prompt: z.string().min(10, { message: 'Please describe the wallpaper you want to generate in at least 10 characters.' }),
+  style: z.string().optional(),
 });
 type GenerateFormValues = z.infer<typeof generateSchema>;
 
@@ -38,6 +40,23 @@ const initialFilters = {
   blur: 0,
 };
 
+const wallpaperStyles = [
+  "Photorealistic",
+  "Digital Art",
+  "Anime",
+  "Cartoon",
+  "Fantasy",
+  "Sci-Fi",
+  "Cyberpunk",
+  "Synthwave",
+  "Vaporwave",
+  "Minimalist",
+  "Abstract",
+  "Watercolor",
+  "Oil Painting",
+  "Low Poly"
+];
+
 export default function Editor({ selectedImage, onImageChange }: EditorProps) {
   const [filters, setFilters] = useState(initialFilters);
   const [isGenerating, setGenerating] = useState(false);
@@ -48,7 +67,7 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
 
   const generateForm = useForm<GenerateFormValues>({
     resolver: zodResolver(generateSchema),
-    defaultValues: { prompt: '' },
+    defaultValues: { prompt: '', style: 'Photorealistic' },
   });
 
   const handleFilterChange = (filterName: keyof typeof filters) => (value: number[]) => {
@@ -103,7 +122,7 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
   const onGenerateSubmit: SubmitHandler<GenerateFormValues> = async (data) => {
     setGenerating(true);
     try {
-      const result = await generateWallpaper({ prompt: data.prompt });
+      const result = await generateWallpaper({ prompt: data.prompt, style: data.style });
       onImageChange(result.imageUrl);
       toast({
         title: 'Success!',
@@ -200,6 +219,28 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
                         <FormControl>
                           <Textarea placeholder="e.g., A majestic wolf howling at a vibrant, neon moon in a dark forest, synthwave style." {...field} />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={generateForm.control}
+                    name="style"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Style</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a style" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {wallpaperStyles.map((style) => (
+                              <SelectItem key={style} value={style}>{style}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}

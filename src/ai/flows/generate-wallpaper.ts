@@ -15,6 +15,10 @@ const GenerateWallpaperInputSchema = z.object({
   prompt: z
     .string()
     .describe('A detailed description of the wallpaper to generate.'),
+  style: z
+    .string()
+    .optional()
+    .describe('The artistic style of the wallpaper.'),
 });
 export type GenerateWallpaperInput = z.infer<typeof GenerateWallpaperInputSchema>;
 
@@ -36,7 +40,7 @@ const generateWallpaperFlow = ai.defineFlow(
   async (input) => {
     const { media } = await ai.generate({
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
-      prompt: `A dark-themed, neon-style mobile wallpaper with an aspect ratio of 9:16. Prompt: ${input.prompt}`,
+      prompt: `A ${input.style || ''} mobile wallpaper with an aspect ratio of 9:16. Prompt: ${input.prompt}`,
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
       },

@@ -1,4 +1,3 @@
-// src/ai/flows/suggest-wallpaper-ideas.ts
 'use server';
 
 /**
@@ -15,7 +14,7 @@ import {z} from 'genkit';
 const SuggestWallpaperIdeaInputSchema = z.object({
   prompt: z
     .string()
-    .describe('A description of the desired wallpaper, e.g., "neon city at night".'),
+    .describe('A description of the desired wallpaper, e.g., "a city at night".'),
 });
 export type SuggestWallpaperIdeaInput = z.infer<typeof SuggestWallpaperIdeaInputSchema>;
 
@@ -35,11 +34,11 @@ const prompt = ai.definePrompt({
   name: 'suggestWallpaperIdeaPrompt',
   input: {schema: SuggestWallpaperIdeaInputSchema},
   output: {schema: SuggestWallpaperIdeaOutputSchema},
-  prompt: `You are a creative assistant that helps users generate wallpaper ideas for their phones.  The wallpapers should have a dark theme with neon colors.
+  prompt: `You are a creative assistant that helps users generate wallpaper ideas for their phones.
 
 The user will provide a prompt describing the wallpaper they want. You will refine this prompt to include trending art styles from ArtStation, if relevant, to improve the visual appeal of the wallpaper.
 
-Trending art styles on ArtStation include: Cyberpunk, Synthwave, Vaporwave, Low Poly, Isometric, Retro.
+Trending art styles on ArtStation include: Photorealistic, Digital Art, Anime, Cartoon, Fantasy, Sci-Fi, Cyberpunk, Synthwave, Vaporwave, Low Poly, Isometric, Retro.
 
 Original Prompt: {{{prompt}}}
 
@@ -64,4 +63,3 @@ const suggestWallpaperIdeaFlow = ai.defineFlow(
     return output!;
   }
 );
-
