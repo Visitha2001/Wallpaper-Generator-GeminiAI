@@ -17,6 +17,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
 
 interface EditorProps {
   selectedImage: string | null;
@@ -143,6 +150,19 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
 
   return (
     <Card className="overflow-hidden">
+       <Dialog open={isGenerating}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-center">Generating Your Masterpiece</DialogTitle>
+            <DialogDescription className="text-center">
+              Please wait while the AI creates your wallpaper. This can take a moment.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center items-center p-4">
+             <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          </div>
+        </DialogContent>
+      </Dialog>
       <div className="grid grid-cols-1 md:grid-cols-12">
         <div className="md:col-span-5 p-4 flex items-center justify-center bg-card/50 min-h-[550px]">
           <div 
@@ -223,12 +243,11 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
                     )}
                   />
                   <Button type="submit" disabled={isGenerating} className="w-full">
-                    {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4"/>}
                     Generate Wallpaper
                   </Button>
                 </form>
               </Form>
-              {isGenerating && <div className="text-center my-4"><Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" /><p className="text-sm text-muted-foreground mt-2">Generating... this can take a moment.</p></div>}
             </TabsContent>
             <TabsContent value="filters" className="pt-4">
               <div className="space-y-4">
