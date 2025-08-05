@@ -21,7 +21,7 @@ export type SuggestWallpaperIdeaInput = z.infer<typeof SuggestWallpaperIdeaInput
 const SuggestWallpaperIdeaOutputSchema = z.object({
   refinedPrompt: z
     .string()
-    .describe('A refined version of the input prompt, incorporating trending art styles.'),
+    .describe('A refined version of the input prompt arround 60 words, incorporating trending art styles.'),
   seoTags: z.string().describe('SEO tags for the generated wallpaper idea'),
 });
 export type SuggestWallpaperIdeaOutput = z.infer<typeof SuggestWallpaperIdeaOutputSchema>;
