@@ -195,38 +195,40 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
           </div>
         </DialogContent>
       </Dialog>
-      <div className="grid grid-cols-1 md:grid-cols-12">
-        <div className="md:col-span-5 p-4 flex items-center justify-center bg-card/50 min-h-[550px]">
-          <div 
-            ref={imagePreviewRef}
-            className="relative w-[225px] h-[487px] shrink-0 rounded-[1.5rem] border-4 border-foreground/50 shadow-2xl overflow-hidden bg-black"
-          >
-             {selectedImage && (
-              <Image
-                ref={imageRef}
-                key={selectedImage}
-                src={selectedImage}
-                alt="Wallpaper preview"
-                fill
-                className="object-cover transition-all duration-300"
-                style={{
-                  filter: `brightness(${filters.brightness}%) contrast(${filters.contrast}%) saturate(${filters.saturate}%) sepia(${filters.sepia}%) grayscale(${filters.grayscale}%) invert(${filters.invert}%)`,
-                }}
-                crossOrigin="anonymous"
-                priority
-              />
-            )}
-             <canvas ref={canvasRef} className="hidden" />
-          </div>
+      <Tabs defaultValue="generate" className="w-full">
+        <div className="p-6 border-b">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="generate"><ImageIcon className="mr-2 h-4 w-4" /> Generate</TabsTrigger>
+            <TabsTrigger value="filters"><Wand2 className="mr-2 h-4 w-4" /> Filters</TabsTrigger>
+          </TabsList>
         </div>
-        <div className="md:col-span-7 p-6 space-y-6 self-center">
-          <Tabs defaultValue="generate" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="generate"><ImageIcon className="mr-2 h-4 w-4" /> Generate</TabsTrigger>
-              <TabsTrigger value="filters"><Wand2 className="mr-2 h-4 w-4" /> Filters</TabsTrigger>
-            </TabsList>
-            <TabsContent value="generate" className="pt-4">
-               <Form {...generateForm}>
+        <TabsContent value="generate">
+          <div className="grid grid-cols-1 md:grid-cols-12">
+            <div className="md:col-span-5 p-4 flex items-center justify-center bg-card/50 min-h-[550px]">
+              <div 
+                ref={imagePreviewRef}
+                className="relative w-[225px] h-[487px] shrink-0 rounded-[1.5rem] border-4 border-foreground/50 shadow-2xl overflow-hidden bg-black"
+              >
+                 {selectedImage && (
+                  <Image
+                    ref={imageRef}
+                    key={selectedImage}
+                    src={selectedImage}
+                    alt="Wallpaper preview"
+                    fill
+                    className="object-cover transition-all duration-300"
+                    style={{
+                      filter: `brightness(${filters.brightness}%) contrast(${filters.contrast}%) saturate(${filters.saturate}%) sepia(${filters.sepia}%) grayscale(${filters.grayscale}%) invert(${filters.invert}%)`,
+                    }}
+                    crossOrigin="anonymous"
+                    priority
+                  />
+                )}
+                 <canvas ref={canvasRef} className="hidden" />
+              </div>
+            </div>
+            <div className="md:col-span-7 p-6 space-y-6 self-center">
+              <Form {...generateForm}>
                 <form onSubmit={generateForm.handleSubmit(onGenerateSubmit)} className="space-y-4">
                   <FormField
                     control={generateForm.control}
@@ -281,8 +283,46 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
                   </Button>
                 </form>
               </Form>
-            </TabsContent>
-            <TabsContent value="filters" className="pt-4">
+              <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
+                 <Button asChild variant="outline" className="font-headline">
+                    <Label className="cursor-pointer">
+                        <Upload className="mr-2 h-4 w-4"/> Upload
+                        <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                    </Label>
+                </Button>
+                <Button onClick={handleDownload} className="bg-primary hover:bg-primary/90 font-headline">
+                  <Download className="mr-2 h-4 w-4"/> Download
+                </Button>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+        <TabsContent value="filters">
+           <div className="grid grid-cols-1 md:grid-cols-12">
+            <div className="md:col-span-5 p-4 flex items-center justify-center bg-card/50 min-h-[550px]">
+              <div 
+                ref={imagePreviewRef}
+                className="relative w-[225px] h-[487px] shrink-0 rounded-[1.5rem] border-4 border-foreground/50 shadow-2xl overflow-hidden bg-black"
+              >
+                 {selectedImage && (
+                  <Image
+                    ref={imageRef}
+                    key={selectedImage}
+                    src={selectedImage}
+                    alt="Wallpaper preview"
+                    fill
+                    className="object-cover transition-all duration-300"
+                    style={{
+                      filter: `brightness(${filters.brightness}%) contrast(${filters.contrast}%) saturate(${filters.saturate}%) sepia(${filters.sepia}%) grayscale(${filters.grayscale}%) invert(${filters.invert}%)`,
+                    }}
+                    crossOrigin="anonymous"
+                    priority
+                  />
+                )}
+                 <canvas ref={canvasRef} className="hidden" />
+              </div>
+            </div>
+            <div className="md:col-span-7 p-6 space-y-6 self-center">
               <div className="space-y-4">
                 <Button onClick={handleBokehEffect} variant="outline" className="w-full font-headline">
                   <Wand2 className="mr-2 h-4 w-4"/> Apply Bokeh Effect (AI)
@@ -314,25 +354,24 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
                   </div>
                 </div>
               </div>
-            </TabsContent>
-          </Tabs>
-          
-          <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
-             <Button asChild variant="outline" className="font-headline">
-                <Label className="cursor-pointer">
-                    <Upload className="mr-2 h-4 w-4"/> Upload
-                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                </Label>
-            </Button>
-            <Button onClick={handleDownload} className="bg-primary hover:bg-primary/90 font-headline">
-              <Download className="mr-2 h-4 w-4"/> Download
-            </Button>
-             <Button onClick={resetFilters} variant="ghost" className="font-headline">
-              <RefreshCw className="mr-2 h-4 w-4"/> Reset
-            </Button>
+              <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
+                <Button asChild variant="outline" className="font-headline">
+                    <Label className="cursor-pointer">
+                        <Upload className="mr-2 h-4 w-4"/> Upload
+                        <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                    </Label>
+                </Button>
+                <Button onClick={handleDownload} className="bg-primary hover:bg-primary/90 font-headline">
+                  <Download className="mr-2 h-4 w-4"/> Download
+                </Button>
+                 <Button onClick={resetFilters} variant="ghost" className="font-headline">
+                  <RefreshCw className="mr-2 h-4 w-4"/> Reset
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
     </Card>
   );
 }

@@ -13,7 +13,7 @@
     --popover: 225 13% 18%;
     --popover-foreground: 0 0% 98%;
     
-    --primary: 289 83% 55%; /* #BE29EC */
+    --primary: 210 100% 50%; /* #0080ff */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 225 13% 30%;
@@ -32,7 +32,7 @@
     --input: 225 13% 28%;
     --ring: 181 100% 62%;
     
-    --radius: 1.5rem;
+    --radius: 2rem;
   }
 
   .dark {
@@ -42,7 +42,7 @@
     --card-foreground: 0 0% 98%;
     --popover: 225 13% 18%;
     --popover-foreground: 0 0% 98%;
-    --primary: 289 83% 55%;
+    --primary: 210 100% 50%;
     --primary-foreground: 0 0% 98%;
     --secondary: 225 13% 30%;
     --secondary-foreground: 0 0% 98%;
