@@ -6,6 +6,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { generateWallpaper } from '@/ai/flows/generate-wallpaper';
+import { applyBokehEffect } from '@/ai/flows/apply-bokeh-effect';
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,7 +45,6 @@ const initialFilters = {
   sepia: 0,
   grayscale: 0,
   invert: 0,
-  blur: 0,
 };
 
 const wallpaperStyles = [
@@ -67,6 +67,7 @@ const wallpaperStyles = [
 export default function Editor({ selectedImage, onImageChange }: EditorProps) {
   const [filters, setFilters] = useState(initialFilters);
   const [isGenerating, setGenerating] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('Generating Your Masterpiece');
   const imagePreviewRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -113,7 +114,7 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
       canvas.width = image.naturalWidth;
       canvas.height = image.naturalHeight;
   
-      ctx.filter = `brightness(${filters.brightness}%) contrast(${filters.contrast}%) saturate(${filters.saturate}%) sepia(${filters.sepia}%) grayscale(${filters.grayscale}%) invert(${filters.invert}%) blur(${filters.blur}px)`;
+      ctx.filter = `brightness(${filters.brightness}%) contrast(${filters.contrast}%) saturate(${filters.saturate}%) sepia(${filters.sepia}%) grayscale(${filters.grayscale}%) invert(${filters.invert}%)`;
       ctx.drawImage(image, 0, 0);
   
       const link = document.createElement('a');
@@ -127,6 +128,7 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
   };
   
   const onGenerateSubmit: SubmitHandler<GenerateFormValues> = async (data) => {
+    setLoadingMessage('Generating Your Masterpiece');
     setGenerating(true);
     try {
       const result = await generateWallpaper({ prompt: data.prompt, style: data.style });
@@ -146,6 +148,36 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
       setGenerating(false);
     }
   };
+  
+  const handleBokehEffect = async () => {
+    if (!selectedImage) {
+      toast({
+        title: 'No Image Selected',
+        description: 'Please upload or generate an image first.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setLoadingMessage('Applying Bokeh Effect...');
+    setGenerating(true);
+    try {
+      const result = await applyBokehEffect({ imageUri: selectedImage });
+      onImageChange(result.imageUrl);
+       toast({
+        title: 'Success!',
+        description: 'The bokeh effect has been applied.',
+      });
+    } catch (error) {
+       console.error(error);
+       toast({
+        title: 'Error',
+        description: 'Failed to apply bokeh effect. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setGenerating(false);
+    }
+  };
 
 
   return (
@@ -153,9 +185,9 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
        <Dialog open={isGenerating}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-center">Generating Your Masterpiece</DialogTitle>
+            <DialogTitle className="text-center">{loadingMessage}</DialogTitle>
             <DialogDescription className="text-center">
-              Please wait while the AI creates your wallpaper. This can take a moment.
+              Please wait while the AI processes your image. This can take a moment.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-center items-center p-4">
@@ -167,7 +199,7 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
         <div className="md:col-span-5 p-4 flex items-center justify-center bg-card/50 min-h-[550px]">
           <div 
             ref={imagePreviewRef}
-            className="relative w-[225px] h-[487px] shrink-0 rounded-2xl border-4 border-foreground/50 shadow-2xl overflow-hidden bg-black"
+            className="relative w-[225px] h-[487px] shrink-0 rounded-[1.5rem] border-4 border-foreground/50 shadow-2xl overflow-hidden bg-black"
           >
              {selectedImage && (
               <Image
@@ -178,7 +210,7 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
                 fill
                 className="object-cover transition-all duration-300"
                 style={{
-                  filter: `brightness(${filters.brightness}%) contrast(${filters.contrast}%) saturate(${filters.saturate}%) sepia(${filters.sepia}%) grayscale(${filters.grayscale}%) invert(${filters.invert}%) blur(${filters.blur}px)`,
+                  filter: `brightness(${filters.brightness}%) contrast(${filters.contrast}%) saturate(${filters.saturate}%) sepia(${filters.sepia}%) grayscale(${filters.grayscale}%) invert(${filters.invert}%)`,
                 }}
                 crossOrigin="anonymous"
                 priority
@@ -252,7 +284,10 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
             </TabsContent>
             <TabsContent value="filters" className="pt-4">
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <Button onClick={handleBokehEffect} variant="outline" className="w-full font-headline">
+                  <Wand2 className="mr-2 h-4 w-4"/> Apply Bokeh Effect (AI)
+                </Button>
+                <div className="grid grid-cols-2 gap-4 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="brightness" className="font-headline">Brightness</Label>
                     <Slider id="brightness" value={[filters.brightness]} onValueChange={handleFilterChange('brightness')} max={200} step={1} />
@@ -276,10 +311,6 @@ export default function Editor({ selectedImage, onImageChange }: EditorProps) {
                   <div className="space-y-2">
                     <Label htmlFor="invert" className="font-headline">Invert</Label>
                     <Slider id="invert" value={[filters.invert]} onValueChange={handleFilterChange('invert')} max={100} step={1} />
-                  </div>
-                  <div className="space-y-2 col-span-2">
-                    <Label htmlFor="blur" className="font-headline">Blur</Label>
-                    <Slider id="blur" value={[filters.blur]} onValueChange={handleFilterChange('blur')} max={10} step={0.1} />
                   </div>
                 </div>
               </div>
