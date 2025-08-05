@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { suggestWallpaperIdea } from '@/ai/flows/suggest-wallpaper-ideas';
 import { generateSeoTags } from '@/ai/flows/generate-seo-tags';
-import { generateWallpaper } from '@/ai/flows/generate-wallpaper';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,9 +14,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Copy, Wand2, Tags, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Copy, Wand2, Tags } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import Image from 'next/image';
 
 const ideaSchema = z.object({
   prompt: z.string().min(10, { message: 'Please describe your idea in at least 10 characters.' }),
@@ -27,14 +25,8 @@ const seoSchema = z.object({
   description: z.string().min(10, { message: 'Please describe the wallpaper in at least 10 characters.' }),
 });
 
-const generateSchema = z.object({
-  prompt: z.string().min(10, { message: 'Please describe the wallpaper you want to generate in at least 10 characters.' }),
-});
-
-
 type IdeaFormValues = z.infer<typeof ideaSchema>;
 type SeoFormValues = z.infer<typeof seoSchema>;
-type GenerateFormValues = z.infer<typeof generateSchema>;
 
 interface AiToolsProps {
   onImageGenerated: (url: string) => void;
@@ -43,10 +35,8 @@ interface AiToolsProps {
 export default function AiTools({ onImageGenerated }: AiToolsProps) {
   const [isIdeaLoading, setIdeaLoading] = useState(false);
   const [isSeoLoading, setSeoLoading] = useState(false);
-  const [isGenerating, setGenerating] = useState(false);
   const [ideaResult, setIdeaResult] = useState<{ refinedPrompt: string; seoTags: string } | null>(null);
   const [seoResult, setSeoResult] = useState<string[] | null>(null);
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
 
   const { toast } = useToast();
 
@@ -58,11 +48,6 @@ export default function AiTools({ onImageGenerated }: AiToolsProps) {
   const seoForm = useForm<SeoFormValues>({
     resolver: zodResolver(seoSchema),
     defaultValues: { description: '' },
-  });
-
-  const generateForm = useForm<GenerateFormValues>({
-    resolver: zodResolver(generateSchema),
-    defaultValues: { prompt: '' },
   });
 
   const onIdeaSubmit: SubmitHandler<IdeaFormValues> = async (data) => {
@@ -101,26 +86,6 @@ export default function AiTools({ onImageGenerated }: AiToolsProps) {
     }
   };
   
-  const onGenerateSubmit: SubmitHandler<GenerateFormValues> = async (data) => {
-    setGenerating(true);
-    setGeneratedImage(null);
-    try {
-      const result = await generateWallpaper({ prompt: data.prompt });
-      setGeneratedImage(result.imageUrl);
-      onImageGenerated(result.imageUrl);
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: 'Error',
-        description: 'Failed to generate wallpaper. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setGenerating(false);
-    }
-  };
-
-
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
@@ -133,9 +98,8 @@ export default function AiTools({ onImageGenerated }: AiToolsProps) {
     <Card>
       <CardContent className="p-0">
         <Tabs defaultValue="idea" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="idea"><Wand2 className="mr-2 h-4 w-4" /> Suggest</TabsTrigger>
-            <TabsTrigger value="generate"><ImageIcon className="mr-2 h-4 w-4" /> Generate</TabsTrigger>
             <TabsTrigger value="tags"><Tags className="mr-2 h-4 w-4" /> SEO Tags</TabsTrigger>
           </TabsList>
           
@@ -174,45 +138,6 @@ export default function AiTools({ onImageGenerated }: AiToolsProps) {
                  <h4 className="font-headline font-semibold">Suggested Tags</h4>
                 <div className="flex flex-wrap gap-2">
                   {ideaResult.seoTags.split(',').map((tag, i) => <Badge key={i} variant="secondary">{tag.trim()}</Badge>)}
-                </div>
-              </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="generate" className="p-6">
-            <Form {...generateForm}>
-              <form onSubmit={generateForm.handleSubmit(onGenerateSubmit)} className="space-y-4">
-                <FormField
-                  control={generateForm.control}
-                  name="prompt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Wallpaper Prompt</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="e.g., A majestic wolf howling at a vibrant, neon moon in a dark forest, synthwave style." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" disabled={isGenerating} className="w-full">
-                  {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Generate Wallpaper
-                </Button>
-              </form>
-            </Form>
-            {isGenerating && <div className="text-center my-4"><Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" /><p className="text-sm text-muted-foreground mt-2">Generating... this can take a moment.</p></div>}
-            {generatedImage && (
-               <div className="mt-6 space-y-4 animate-in fade-in">
-                <h4 className="font-headline font-semibold">Generated Image</h4>
-                <div className="rounded-md overflow-hidden border border-border">
-                  <Image 
-                    src={generatedImage}
-                    alt="Generated Wallpaper"
-                    width={375}
-                    height={812}
-                    className="w-full h-auto object-contain"
-                  />
                 </div>
               </div>
             )}
