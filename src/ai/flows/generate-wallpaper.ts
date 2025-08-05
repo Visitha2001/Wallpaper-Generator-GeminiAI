@@ -1,13 +1,5 @@
 'use server';
 
-/**
- * @fileOverview Generates a wallpaper image based on a user-provided prompt.
- *
- * - generateWallpaper - A function that accepts a user prompt and returns the generated image URL.
- * - GenerateWallpaperInput - The input type for the generateWallpaper function.
- * - GenerateWallpaperOutput - The return type for the generateWallpaper function.
- */
-
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
@@ -46,7 +38,7 @@ const generateWallpaperFlow = ai.defineFlow(
       },
     });
     
-    if (!media.url) {
+    if (!media?.url) {
       throw new Error('Image generation failed.');
     }
 

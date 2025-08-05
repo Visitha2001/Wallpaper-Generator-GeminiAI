@@ -47,7 +47,7 @@ const applyBokehEffectFlow = ai.defineFlow(
       },
     });
     
-    if (!media.url) {
+    if (!media?.url) {
       throw new Error('Image processing failed.');
     }
 
